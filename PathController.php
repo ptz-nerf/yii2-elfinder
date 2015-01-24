@@ -117,7 +117,12 @@ class PathController extends Controller{
 
 			$options['lang'] = $_GET['langCode'];
 		}
-
+		
+		if(isset($_GET['tinyMCE'])) {
+			$options['tinyMCE'] = 1;
+            $options['getFileCallback'] = new JsExpression('function(file) { FileBrowserDialogue.mySubmit(file); }');
+        }
+		
 		if(isset($_GET['filter'])){
 			if(is_array($_GET['filter']))
 				$options['onlyMimes'] = $_GET['filter'];

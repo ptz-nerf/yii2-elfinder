@@ -11,7 +11,6 @@ use yii\helpers\Json;
 Assets::register($this);
 Assets::addLangFile($options['lang'], $this);
 
-
 $this->registerJs("
 function ElFinderGetCommands(disabled){
     var Commands = elFinder.prototype._options.commands;
@@ -46,6 +45,54 @@ function ElFinderGetCommands(disabled){
 
     elFinderFullscreen();
     ");
+if(!empty($options['tinyMCE'])) {
+	$this->registerJs("
+		var findField = function(name, control){
+			if(control.name() == name){
+				return control;
+			}
+
+			if(control.items != null){
+				var ta = control.items().toArray();
+				for(var x = 0; x < ta.length; x++){
+					var r = findField(name, ta[x]);
+					if(r != null) return r;
+				}
+			}
+			return null;
+		}
+		
+		var FileBrowserDialogue = {
+			init: function() {
+				// Here goes your code for setting your custom things onLoad.
+			},
+			mySubmit: function (file) {
+				var params = parent.tinymce.activeEditor.windowManager.getParams();
+				params.setUrl(file.url);
+				
+				if(params.type == 'image') {
+					var t = top.tinymce.activeEditor.windowManager.windows[0];
+					var f = findField('width', t);    
+					if(f != null){
+						params.window.document.getElementById(f._id).value = file.width;
+					}
+					f = findField('height', t);    
+					if(f != null) {
+						params.window.document.getElementById(f._id).value = file.height;
+					}
+				} 
+				
+				parent.tinymce.activeEditor.windowManager.close(); // close popup window
+			}
+		}"
+	);
+	$this->registerCss("
+	#elfinder, #elfinder .elfinder-toolbar {
+		border-top-left-radius: 0;
+		border-top-right-radius: 0;
+	}
+	");
+}
 
 
 $this->registerCss("

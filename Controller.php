@@ -32,17 +32,17 @@ class Controller extends BaseController{
 
     public function behaviors()
     {
-      return [
-        'access' => [
-          'class' => AccessControl::className(),
-          'rules' => [
-            [
-              'allow' => true,
-              'roles' => $this->access,
-            ],
-          ],
-        ],
-      ];
+		return [
+			'access' => [
+				'class' => AccessControl::className(),
+				'rules' => [
+					[
+						'allow' => true,
+						'roles' => $this->access,				
+					],
+				],
+			],
+		];
     }
 
 
@@ -107,6 +107,10 @@ class Controller extends BaseController{
             'window.close(); }');
 
             $options['lang'] = $_GET['langCode'];
+        }
+		
+		if(isset($_GET['tinyMCE'])){
+            $options['getFileCallback'] = new JsExpression('function(file) { FileBrowserDialogue.mySubmit(file); }');
         }
 
         if(isset($_GET['filter'])){

@@ -11,6 +11,7 @@ use yii\base\Widget as BaseWidjet;
 use yii\helpers\ArrayHelper;
 use yii\helpers\Html;
 use yii\helpers\Json;
+use yii\web\JsExpression;
 
 /**
  * Class Widget
@@ -54,7 +55,43 @@ class ElFinder extends BaseWidjet{
             'filebrowserFlashBrowseUrl' => self::getManagerUrl($id, ArrayHelper::merge($params, ['filter'=>'flash'])),
         ], $options);
     }
+	
+	public static function tinyMCECallback($controller, $options = []) {
 
+		if(is_array($controller)){
+			$id = $controller[0];
+			unset($controller[0]);
+			$params = $controller;
+		}else{
+			$id = $controller;
+			$params = [];
+		}
+		
+		$options['tinyMCE'] = 1; 
+		$params = ArrayHelper::merge($params, $options);
+		
+		$url = self::getManagerUrl($id, $params);
+		
+		return new JsExpression(
+			"function(field_name, url, type, win) {
+				tinymce.activeEditor.windowManager.open({
+					file: '".$url."' + (type == 'image' ? '&filter=image' : ''),
+					title: 'elFinder 2.0',
+					width: 900,  
+					height: 600,
+					resizable: 'yes'
+				}, {
+					setUrl: function (url) {
+					  win.document.getElementById(field_name).value = url;
+					},
+					type: type,
+					window: win
+				});
+				return false;
+			}"
+		);
+    }
+	
     public function init()
     {
         if(empty($this->language))
